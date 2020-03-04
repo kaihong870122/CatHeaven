@@ -1,100 +1,75 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class Player : MonoBehaviour
 {
-    public enum Direction {DOWN = 0,UP = 1,LEFT = 2,RIGHT = 3};
-    private Direction mDir = Direction.DOWN;
-    private bool mWalking = false;
     private Rigidbody2D playerigidbody2D;
-    private Animator ani;        
-    
-    //腳色移動:左右
-    public void Right(int v)
-    {        
-        gameObject.transform.position += new Vector3(v * 0.05f, 0, 0);        
-    }
-    //腳色移動:上下
-    public void UP(int h)
-    {
-        gameObject.transform.position += new Vector3(0, h * 0.05f, 0);
-    }
+    private Animator ani; 
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        print("a");
-        
-    }
-
-    private void Move()
-    {
-        
-    }
-    //以下測試
     private void Start()
     {
         playerigidbody2D = GetComponent<Rigidbody2D>();
-        ani = GetComponent<Animator>();
-        this.Dir = mDir;
+        ani = GetComponent<Animator>();        
     }
 
-    public Direction Dir
+    /// <summary>
+    /// 腳色移動:左右
+    /// </summary>
+    public void Right(int v)
     {
-        get
-        {
-            return mDir;
-        }
-        set
-        {
-            mDir = value;
+        gameObject.transform.position += new Vector3(v * 0.05f, 0, 0);        //設定用按鈕去 左右 操作玩家
+        ani.SetBool("向右", v == 1 && v != 0 ? true : false);                 //如果判斷 v 值為 1 時 就為 true 不是就 false
+        ani.SetBool("向左", v == -1 && v != 0 ? true : false);                //如果判斷 v 值為 -1 時 就為 true 不是就 false
 
-            ani.SetInteger("向後", (int)mDir);
-        }
+    }
+    /// <summary>
+    /// 腳色移動:上下
+    /// </summary>    
+    public void UP(int h)
+    {   
+        gameObject.transform.position += new Vector3(0, h * 0.05f, 0);        //設定用按鈕去 上下 操作玩家
+        ani.SetBool("向後", h == 1 && h != 0 ? true : false);                 //如果判斷 h 值為 1 時 就為 true 不是就 false
+        ani.SetBool("向前", h == -1 && h != 0 ? true : false);                //如果判斷 h 值為 -1 時 就為 true 不是就 false
+
     }
 
-    public bool IsWalking
+
+    /// <summary>
+    /// 設定一個計時器並且到時間就跳到另一個畫面
+    /// </summary>
+    private float timer;
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        get
+        timer += Time.deltaTime;
+        if (timer>5)
         {
-            return mWalking;
-        }
-        set
-        {
-            mWalking = value;
-
-            ani.SetBool("向前", mWalking);
+            SceneManager.LoadScene("戰鬥畫面");
+            timer = 0;
         }
     }
 
-    public void UpdateWithMoveVector(Vector2 moveVec)
-    {
 
-        if (moveVec == Vector2.zero)
-        {
-            this.IsWalking = false;
-            return;
-        }
+    //private int R;
+    //private bool open;
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if (collision.name == "草叢")
+    //    {
+    //        open = true;
+    //    }
+    //}
+    //private void Move()
+    //{
+    //    if (open==true)
+    //    {
+    //        R = Random.Range(0, 9);
+    //        if (R < 4)
+    //        {
+    //            SceneManager.LoadScene("戰鬥畫面");
+    //        }
+    //    }
+    //}
 
-        this.IsWalking = true;
-        // X vector has something
-        if (moveVec.x > 0)
-        {
-            this.Dir = Direction.RIGHT;
-        }
-        else if (moveVec.x < 0)
-        {
-            this.Dir = Direction.LEFT;
-        }
-
-        // X vector = 0
-        if (moveVec.y > 0)
-        {
-            this.Dir = Direction.UP;
-        }
-        else if (moveVec.y < 0)
-        {
-            this.Dir = Direction.DOWN;
-        }
-    }
 
 }
